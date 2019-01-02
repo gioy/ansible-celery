@@ -1,6 +1,12 @@
 ---
+- name: Create service group for Celery
+  user: name="{{ celery_user_group }}"
+        system=yes
+        state=present
+
 - name: Create service account for Celery
-  user: name=celery
+  user: name="{{ celery_user }}"
+        group="{{ celery_user_group }}"
         system=yes
         home="{{ celery_dir }}"
         shell=/bin/false
@@ -18,7 +24,7 @@
   copy: content="" dest="{{ celery_log }}" force=no
 
 - name: Set log file permissions
-  file: path="{{ celery_log }}" owner=celery group=celery mode=0644
+  file: path="{{ celery_log }}" owner="{{ celery_user }}" group="{{ celery_user_group }}" mode=0644
 
 - name: Configure Celery log rotation
   template: src=logrotate_celery.j2 dest=/etc/logrotate.d/celery
