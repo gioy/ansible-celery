@@ -45,6 +45,9 @@
     (ansible_distribution == 'Debian' and ansible_distribution_version|int < 8) or
     (ansible_distribution == 'CentOS' and ansible_distribution_version|int < 7)
 
+- name: "Ensures {{ celery_working_dir }} dir exists"
+  file: path="{{ celery_working_dir }}" owner=root group=root state=directory
+
 - name: Touch log file if it does not exist
   copy: content="" dest="{{ celery_log }}" force=no
 

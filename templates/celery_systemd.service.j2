@@ -7,7 +7,7 @@ Type=forking
 User={{ celery_user }}
 Group={{ celery_user_group }}
 EnvironmentFile={{ celery_systemd_conf_file }}
-WorkingDirectory=/opt/celery
+WorkingDirectory={{ celery_working_dir }}
 ExecStart=/bin/sh -c '${CELERY_BIN} multi start ${CELERYD_NODES} \
   -A ${CELERY_APP} --pidfile=${CELERYD_PID_FILE} \
   --logfile=${CELERYD_LOG_FILE} --loglevel=${CELERYD_LOG_LEVEL} ${CELERYD_OPTS}'
