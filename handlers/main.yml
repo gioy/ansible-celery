@@ -1,3 +1,6 @@
 ---
+- name: Restart Celery (systemd)
+  service: name=celery.service state=restarted daemon_reload=yes enabled=yes
+
 - name: Restart Celery
-  service: name=celery state=restarted
+  service: name=celery state=restarted enabled=yes
