@@ -1,10 +1,10 @@
 ---
-- name: Create service group for Celery
+- name: Create system group for Celery
   user: name="{{ celery_user_group }}"
         system=yes
         state=present
 
-- name: Create service account for Celery
+- name: Create system user for Celery
   user: name="{{ celery_user }}"
         group="{{ celery_user_group }}"
         system=yes
@@ -15,39 +15,6 @@
 - name: Install Celery
   pip: name="celery[redis]" version="{{ celery_version }}" state=present
 
-- name: "Ensures {{ celery_systemd_conf_dir }} dir exists"
-  file: path="{{ celery_systemd_conf_dir }}" owner=root group=root state=directory
-
-- name: Configure Celery systemd service configuration
-  template: src=celery_systemd.conf.j2 dest="{{ celery_systemd_conf_file }}"
-  when: >
-    (ansible_distribution == 'Ubuntu' and ansible_distribution_version|int >= 16) or
-    (ansible_distribution == 'Debian' and ansible_distribution_version|int >= 8) or
-    (ansible_distribution == 'CentOS' and ansible_distribution_version|int >= 7) or
-    (ansible_distribution == 'Fedora')
-
-- name: Configure Celery systemd service definition
-  template: src=celery_systemd.service.j2 dest="{{ celery_systemd_service_file }}"
-  notify:
-    - Restart Celery (systemd)
-  when: >
-    (ansible_distribution == 'Ubuntu' and ansible_distribution_version|int >= 16) or
-    (ansible_distribution == 'Debian' and ansible_distribution_version|int >= 8) or
-    (ansible_distribution == 'CentOS' and ansible_distribution_version|int >= 7) or
-    (ansible_distribution == 'Fedora')
-
-- name: Configure Celery service definition
-  template: src=celery_init.conf.j2 dest=/etc/init/celery.conf
-  notify:
-    - Restart Celery
-  when: >
-    (ansible_distribution == 'Ubuntu' and ansible_distribution_version|int < 16) or
-    (ansible_distribution == 'Debian' and ansible_distribution_version|int < 8) or
-    (ansible_distribution == 'CentOS' and ansible_distribution_version|int < 7)
-
-- name: "Ensures {{ celery_working_dir }} dir exists"
-  file: path="{{ celery_working_dir }}" owner=root group=root state=directory
-
 - name: Touch log file if it does not exist
   copy: content="" dest="{{ celery_log }}" force=no
 
@@ -56,3 +23,7 @@
 
 - name: Configure Celery log rotation
   template: src=logrotate_celery.j2 dest=/etc/logrotate.d/celery
+
+- name: Daemonize celery
+  include: daemonize.yml
+  when: celery_daemonize

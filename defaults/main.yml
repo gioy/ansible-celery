@@ -17,6 +17,7 @@ celery_nodes:
   - localhost
 celeryd_options: ""
 celery_log_level: "error"
+celery_daemonize: False
 
 celery_log: "/var/log/celery.log"
 celery_log_rotate_count: 5
